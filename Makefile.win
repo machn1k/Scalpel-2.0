@@ -1,0 +1,32 @@
+CC = gcc
+CC_OPTS = -Wall -g -O2
+GOAL = scalpel
+
+CC += $(CC_OPTS) 
+  .c.o: 
+	$(CC) -c $<
+
+HEADER_FILES = src/scalpel.h src/common.h src/syncqueue.h src/prioque.h src/dirname.h
+SRC =  src/helpers.c src/syncqueue.c src/files.c src/scalpel.c src/dig.c src/prioque.c src/base_name.c
+OBJS =  src/helpers.o src/scalpel.o src/files.o src/dig.o src/prioque.o src/base_name.o
+WIN32-INCLUDES = -I. -Itre-0.7.5-win32/lib -Ipthreads-win32
+WIN32-LIBS = -liberty -L. -Ltre-0.7.5-win32/lib -L pthreads-win32 -lpthreadGC2 -ltre-4
+NONWIN32-LIBS = -lpthread -lm -ltre
+
+all: win32
+
+win32: CC += -D__WIN32 $(WIN32-INCLUDES)
+win32: $(SRC) $(HEADER_FILES)
+	$(CC) -o $(GOAL).exe $(SRC) $(WIN32-LIBS) 
+
+scalpel.o: scalpel.c $(HEADER_FILES) Makefile
+dig.o: dig.c $(HEADER_FILES) Makefile
+helpers.o: helpers.c $(HEADER_FILES) Makefile
+files.o: files.c $(HEADER_FILES) Makefile
+prioque.o: prioque.c prioque.h Makefile
+
+nice:
+	rm -rf scalpel-output
+
+clean: nice
+	rm -f $(OBJS) $(GOAL) $(GOAL).exe 
